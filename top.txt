@@ -1,0 +1,35 @@
+module top;
+
+
+import mux_user_pkg::*;
+import uvm_pkg::*;
+`include "uvm_macros.svh"
+//`include "interface.sv"
+
+
+bit clock=1;
+
+
+
+always
+begin
+        forever #10 clock = ~clock;
+end
+
+inf vif(clock);
+//inf vif();
+
+mux duv(.in(vif.in),.out(vif.out),.sel(vif.sel));
+
+initial
+begin
+    `ifdef VCS
+        $fsdbDumpvars(0,top);
+   `endif
+    uvm_config_db#(virtual inf)::set(null,"*","virtual_inf",vif);
+//    uvm_config_db#(virtual inf.WR_MON_MP)::set(null,"*","virtual_inf",vif);
+//    uvm_config_db#(virtual inf.RD_MON_MP)::set(null,"*","virtual_inf",vif);
+    run_test();
+end
+
+endmodule

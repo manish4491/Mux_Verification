@@ -1,0 +1,38 @@
+class rd_mon extends uvm_monitor;
+
+    virtual inf vif;
+    virtual inf.RD_MON_MP vif0;
+    uvm_analysis_port #(xtn)ap;
+
+    `uvm_component_utils(rd_mon)
+    function new(string name="rd_mon",uvm_component parent);
+        super.new(name,parent);
+        ap = new("ap",this);
+    endfunction
+    xtn mux_xtn;
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+         if(!uvm_config_db#(virtual inf)::get(this,"","virtual_inf",vif))
+            `uvm_fatal("READ_MONITOR","FAILED TO GET INTERFACE")
+        vif0 =vif;
+    endfunction
+
+    task run_phase(uvm_phase phase);
+        super.run_phase(phase);
+//        mux_xtn=xtn::type_id::create("mux_xtn");   // in case of error try creating object inside forever and create new object everytime
+        forever
+        begin
+	    @(vif0.rd_mon_cb);
+            mux_xtn=xtn::type_id::create("mux_xtn");
+	    mux_xtn.in   = vif0.rd_mon_cb.in;
+	    mux_xtn.sel  = vif0.rd_mon_cb.sel;
+	    mux_xtn.out  = vif0.rd_mon_cb.out;	    
+            ap.write(mux_xtn);
+            $display("\n\t ---------------------READ MONITOR--------------------");
+            mux_xtn.print();
+	//    #1;
+//            @(vif0.rd_mon_cb);
+	end
+    endtask
+    
+    endclass

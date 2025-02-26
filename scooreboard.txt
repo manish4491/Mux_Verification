@@ -1,0 +1,59 @@
+class scrb extends uvm_scoreboard;
+    
+    `uvm_component_utils(scrb)
+    uvm_tlm_analysis_fifo #(xtn)a_fifo_1;
+    uvm_tlm_analysis_fifo #(xtn)a_fifo_2;
+    xtn rd_mon_xtn;
+    xtn wr_mon_xtn;
+    xtn wr_cov_xtn;
+   
+    covergroup wr_cg;
+	option.per_instance = 1;
+	
+	INPUT : coverpoint wr_cov_xtn.in[7:0]
+			   {
+				bins i0 = {[0:63]};
+				bins i1 = {[64:127]};
+				bins i2 = {[128:191]};
+				bins i3 = {[192:255]};
+			   }
+	SEL : coverpoint wr_cov_xtn.sel[2:0]
+			   {
+				bins s[] = {[0:7]};
+			   }
+    endgroup     
+
+
+    function new(string name="scrb",uvm_component parent);
+        super.new(name,parent);
+	wr_cg = new();
+    endfunction
+
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        a_fifo_1=new("a_fifo_1",this);
+        a_fifo_2=new("a_fifo_2",this);
+    endfunction
+
+    task run_phase(uvm_phase phase);
+        super.run_phase(phase);
+        forever
+        begin
+		    a_fifo_2.get(wr_mon_xtn);
+                    a_fifo_1.get(rd_mon_xtn);
+		    
+		    //COVERAGE LOGIC           	   
+		    wr_cov_xtn = xtn::type_id::create("wr_cov_xtn");
+		    wr_cov_xtn = wr_mon_xtn;
+		    wr_cg.sample();
+   
+            	    $display("\n\t ------------------SCOREBOARD--------------------");
+			
+		    $display("\n\t INPUT:%b(%d), \t SELECT: %d \t EXP. OUTPUT:%0b \t ACT OUTPUT:%0b",wr_mon_xtn.in,wr_mon_xtn.in,wr_mon_xtn.sel,wr_mon_xtn.in[wr_mon_xtn.sel],rd_mon_xtn.out); 
+	            if (rd_mon_xtn.out == wr_mon_xtn.in[wr_mon_xtn.sel])
+			$display("\n\t MATCHED!!");
+                    else
+                        $display("\n\t ERROR!! MISMATCH!!");          
+        end
+    endtask
+endclass

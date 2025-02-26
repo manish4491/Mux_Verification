@@ -1,0 +1,21 @@
+class mux_sequence extends uvm_sequence#(xtn);
+    `uvm_object_utils(mux_sequence)
+    function new(string name="mux_sequence");
+        super.new(name);
+    endfunction
+
+    task body();
+//        req=xtn::type_id::create("req");
+        repeat(30)
+        begin
+           req=xtn::type_id::create("req");
+           start_item(req);
+           assert(req.randomize() with {
+                                                sel dist {[0:7] :/ 100};
+
+                                        });
+           finish_item(req);
+           #1;
+      end
+    endtask
+endclass

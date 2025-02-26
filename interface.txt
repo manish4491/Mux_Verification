@@ -1,0 +1,32 @@
+interface inf(input bit clk);
+    bit [7:0]in;
+    bit [2:0]sel;
+    bit out;
+
+    bit clock;
+    assign clock = clk;
+
+    clocking wr_drv_cb@(posedge clk);
+        default input #1 output #0;
+        output in;
+        output sel;
+    endclocking
+
+    clocking wr_mon_cb@(negedge clk);
+        default input #1 output #0;
+        input in;
+        input sel;
+    endclocking
+
+    clocking rd_mon_cb@(negedge clk);
+        default input #1 output #0;
+        input in;
+        input sel;
+        input out;
+    endclocking
+
+    modport WR_DRV_MP (clocking wr_drv_cb);
+    modport WR_MON_MP (clocking wr_mon_cb);
+    modport RD_MON_MP (clocking rd_mon_cb);
+
+endinterface

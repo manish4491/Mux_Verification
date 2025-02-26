@@ -1,0 +1,17 @@
+class xtn extends uvm_sequence_item;
+    `uvm_object_utils(xtn)
+    function new(string name = "xtn");
+        super.new(name);
+    endfunction
+
+    rand bit [7:0]in;
+    rand bit [2:0]sel;
+    logic [7:0]out;
+
+    function void do_print (uvm_printer printer);
+        super.do_print(printer);
+        printer.print_field("INPUT",this.in,"8",UVM_DEC);
+        printer.print_field("SEL",this.sel,"3",UVM_DEC);
+        printer.print_field("OUTPUT",this.out,"8",UVM_DEC);
+    endfunction
+endclass

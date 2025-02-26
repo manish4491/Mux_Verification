@@ -1,0 +1,35 @@
+class wr_drv extends uvm_driver#(xtn);
+    `uvm_component_utils(wr_drv)
+    function new(string name = "wr_drv",uvm_component parent);
+        super.new(name,parent);
+    endfunction
+
+    virtual inf vif;
+    virtual inf.WR_DRV_MP vif0;
+
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        if(!uvm_config_db#(virtual inf)::get(this,"","virtual_inf",vif))
+            `uvm_fatal("WRITE_DRIVER","FAILED TO GET INTERFACE")
+        vif0 = vif;
+    endfunction
+
+    task run_phase(uvm_phase phase);
+        super.run_phase(phase);
+        forever
+        begin
+            seq_item_port.get_next_item(req);
+            drive2dut(req);
+            $display("\n\t--------------------DRIVER-----------------------------");
+            req.print();
+            seq_item_port.item_done();
+        end
+    endtask
+
+    task drive2dut(xtn mux_xtn);
+   //     @ (vif0.wr_drv_cb);
+        vif0.wr_drv_cb.in  <= mux_xtn.in;
+        vif0.wr_drv_cb.sel <= mux_xtn.sel;
+      @ (vif0.wr_drv_cb);
+    endtask
+endclass

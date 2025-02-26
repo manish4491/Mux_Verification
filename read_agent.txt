@@ -1,0 +1,20 @@
+class rd_agent extends uvm_agent;
+      `uvm_component_utils(rd_agent)
+    function new(string name="rd_agent",uvm_component parent);
+        super.new(name,parent);
+    endfunction
+    env_config env_cfg;
+    rd_mon rd_m;
+
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);    
+        if(!uvm_config_db#(env_config)::get(this,"","env_config",env_cfg))
+            `uvm_fatal("WRITE_AGENT","FAILED TO RECIEVE CONFIG")
+        if(env_cfg.wr_cfg==UVM_ACTIVE)
+        begin
+                $display("\n\t NO DRIVER/SEQUENCER");
+        end
+            rd_m = rd_mon::type_id::create("rd_m",this);
+    endfunction
+
+endclass

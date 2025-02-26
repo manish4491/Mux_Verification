@@ -1,0 +1,21 @@
+class virtual_sequence extends uvm_sequence #(uvm_sequence_item);
+    `uvm_object_utils(virtual_sequence)
+    function new(string name="virtual_sequence");
+        super.new(name);
+    endfunction
+
+    virtual_sequencer vsqr;
+    mux_sequence seq;
+    wr_sequencer wr_sqr;
+
+    task body();
+        assert ($cast(vsqr,m_sequencer))
+        else
+            `uvm_fatal("VIRTUAL_SEQUENCE","FAILED TO GET INTERFACE")
+
+        seq  = mux_sequence::type_id::create("seq");
+//      wr_sqr = wr_sequencer::type_id::create("wr_sqr",this);
+        wr_sqr = vsqr.wr_sqr;
+	seq.start(wr_sqr); 
+    endtask
+endclass

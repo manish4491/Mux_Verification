@@ -1,0 +1,10 @@
+class env_config extends uvm_object;
+    `uvm_object_utils(env_config)
+
+    function new(string name="env_config");
+        super.new(name);
+    endfunction
+
+    uvm_active_passive_enum wr_cfg=UVM_ACTIVE;
+    uvm_active_passive_enum rd_cfg=UVM_ACTIVE;
+endclass
